@@ -52,7 +52,7 @@ export default function TicketForm({
     })
 
     const {
-        execute: executeSave,
+        executeAsync: executeSave,
         result: saveResult,
         isPending: isSaving,
         reset: resetSaveAction,
@@ -76,7 +76,18 @@ export default function TicketForm({
     })
 
     async function submitForm(data: insertTicketSchemaType) {
-        executeSave(data)
+        resetSaveAction()
+        try {
+            await executeSave(data)
+        } catch (error) {
+            if (error instanceof Error) {
+                toast({
+                    variant: "destructive",
+                    title: "Error",
+                    description: `You might have a network error. Please try again later. If the problem persists, contact your support. Action error: ${error.message}`,
+                })
+            }
+        }
     }
 
     return (

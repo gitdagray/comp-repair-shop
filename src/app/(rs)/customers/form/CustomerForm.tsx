@@ -76,7 +76,7 @@ export default function CustomerForm({ customer, isManager = false }: Props) {
     }, [searchParams.get("customerId")]) // eslint-disable-line react-hooks/exhaustive-deps
 
     const {
-        execute: executeSave,
+        executeAsync: executeSave,
         result: saveResult,
         isPending: isSaving,
         reset: resetSaveAction,
@@ -100,7 +100,18 @@ export default function CustomerForm({ customer, isManager = false }: Props) {
     })
 
     async function submitForm(data: insertCustomerSchemaType) {
-        executeSave(data)
+        resetSaveAction()
+        try {
+            await executeSave(data)
+        } catch (error) {
+            if (error instanceof Error) {
+                toast({
+                    variant: "destructive",
+                    title: "Error",
+                    description: `You might have a network error. Please try again later. If the problem persists, contact your support. Action error: ${error.message}`,
+                })
+            }
+        }
     }
 
     return (
